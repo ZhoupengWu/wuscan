@@ -6,7 +6,7 @@ def crea_tabella():
     with connections[DB].cursor() as cur:
         cur.execute("""
             CREATE TABLE IF NOT EXISTS scanner (
-                id INTEGER not null PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 text TEXT,
                 colpo TEXT
             )

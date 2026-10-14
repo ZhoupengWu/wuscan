@@ -1,19 +1,150 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-    <h1 align="center">Buona sera</h1>
-    <button id="guarda">GUARDA</button>
+{% extends "home_test/base.html" %}
 
-    <script>
-        const button = document.getElementById("guarda");
-        button.addEventListener("click", () => {
-            window.location = "visualizza/";
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-4">Buona sera</h1>
+
+<div class="d-flex justify-content-center gap-2 mb-4">
+    <button id="btn-crea" class="btn btn-outline-secondary">Crea tabella</button>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-inserisci">
+        Inserisci dati
+    </button>
+    <button id="btn-guarda" class="btn btn-success">Guarda</button>
+</div>
+
+<div id="messaggio"></div>
+<div id="risultati" class="row g-3"></div>
+
+<div class="modal fade" id="modal-inserisci" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="form-inserisci" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title">Nuovo dato</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="text">Text</label>
+                    <input type="text" class="form-control" id="text" name="text" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="colpo">Colpo</label>
+                    <input type="text" class="form-control" id="colpo" name="colpo" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="submit" class="btn btn-primary">Salva</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const URL_CREA = "{% url 'crea-tabella' %}";
+    const URL_INSERISCI = "{% url 'inserisci' %}";
+    const URL_VISUALIZZA = "{% url 'visualizza' %}";
+
+    const risultati = document.getElementById("risultati");
+    const messaggio = document.getElementById("messaggio");
+
+    function mostraMessaggio(testo, tipo = "success") {
+        messaggio.innerHTML = "";
+        const div = document.createElement("div");
+        div.className = `alert alert-${tipo}`;
+        div.textContent = testo;
+        messaggio.appendChild(div);
+    }
+
+    function creaCard(riga) {
+        const col = document.createElement("div");
+        col.className = "col-12 col-md-6 col-lg-4";
+
+        const card = document.createElement("div");
+        card.className = "card h-100 shadow-sm border-0 card-hover";
+
+        const header = document.createElement("div");
+        header.className = "card-header bg-primary text-white d-flex justify-content-between align-items-center";
+
+        const titolo = document.createElement("span");
+        titolo.className = "fw-semibold";
+        titolo.textContent = riga.text;
+
+        const badge = document.createElement("span");
+        badge.className = "badge bg-light text-primary";
+        badge.textContent = `#${riga.id}`;
+
+        header.append(titolo, badge);
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        const etichetta = document.createElement("h6");
+        etichetta.className = "card-subtitle mb-2 text-muted text-uppercase small";
+        etichetta.textContent = "Colpo";
+
+        const testo = document.createElement("p");
+        testo.className = "card-text fs-5 mb-0";
+        testo.textContent = riga.colpo;
+
+        body.append(etichetta, testo);
+        card.append(header, body);
+        col.appendChild(card);
+
+        return col;
+    }
+
+    async function carica() {
+        try {
+            const res = await fetch(URL_VISUALIZZA);
+
+            if (!res.ok) throw new Error();
+
+            const dati = await res.json();
+
+            risultati.innerHTML = "";
+
+            if (dati.scanner.length === 0) {
+                mostraMessaggio("Nessun dato presente.", "info");
+
+                return;
+            }
+            messaggio.innerHTML = "";
+
+            dati.scanner.forEach(riga => risultati.appendChild(creaCard(riga)));
+        } catch {
+            mostraMessaggio("Errore nella lettura. Hai creato la tabella?", "danger");
+        }
+    }
+
+    document.getElementById("btn-crea").addEventListener("click", async () => {
+        const res = await fetch(URL_CREA);
+        mostraMessaggio(await res.text(), res.ok ? "success" : "danger");
+    });
+
+    document.getElementById("btn-guarda").addEventListener("click", carica);
+
+    document.getElementById("form-inserisci").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const form = e.target;
+
+        const res = await fetch(URL_INSERISCI, {
+            method: "POST",
+            body: new FormData(form),
         });
-    </script>
-</body>
-</html>
+        const testo = await res.text();
+
+        if (res.ok) {
+            form.reset();
+            bootstrap.Modal.getInstance(document.getElementById("modal-inserisci")).hide();
+            mostraMessaggio(testo, "success");
+            carica();
+
+        } else {
+            mostraMessaggio(testo, "danger");
+        }
+    });
+</script>
+{% endblock %}
