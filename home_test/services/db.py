@@ -26,3 +26,21 @@ def leggi_note():
         """)
 
         return cur.fetchall()
+
+def stato():
+    with connections[DB].cursor() as cur:
+        cur.execute("""
+            SELECT name
+            FROM sqlite_master
+            WHERE type = "table" AND name = %s
+        """, ["scanner"])
+
+        is_exist = cur.fetchone() is not None
+
+        rows = 0
+
+        if is_exist:
+            cur.execute("SELECT COUNT(*) FROM scanner")
+            rows = cur.fetchone()[0]
+
+    return {"tabella": is_exist, "righe": rows}

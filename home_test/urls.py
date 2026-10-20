@@ -6,4 +6,5 @@ urlpatterns = [
     path("visualizza/", views.visualizza, name="visualizza"),
     path("crea-tabella/", views.creaTabella, name="crea-tabella"),
     path("inserisci/", views.inserisciDati, name="inserisci"),
+    path("stato/", views.statoDB, name="stato-db")
 ]

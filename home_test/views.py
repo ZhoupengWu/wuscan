@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from .services.db import crea_tabella, aggiungi_nota, leggi_note
+from .services.db import crea_tabella, aggiungi_nota, leggi_note, stato
 from django.views.decorators.http import require_POST
 
 def home(request: HttpRequest):
@@ -28,3 +28,6 @@ def inserisciDati(request: HttpRequest):
     aggiungi_nota(text, colpo)
 
     return HttpResponse("Dati inseriti", status=201)
+
+def statoDB(request: HttpRequest):
+    return JsonResponse(stato())

@@ -1,0 +1,140 @@
+{% extends "landing/base.html" %}
+
+{% block title %}Wuscan - Scansiona e organizza{% endblock %}
+
+{% block content %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">Wuscan</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menu">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                <li class="nav-item"><a class="nav-link" href="#funzioni">Funzioni</a></li>
+                <li class="nav-item"><a class="nav-link" href="#come-funziona">Come funziona</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contatti">Contatti</a></li>
+                <li class="nav-item">
+                    <a class="btn btn-primary btn-sm" href="/home/">Apri l'app</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="hero text-white text-center d-flex align-items-center">
+    <div class="container py-5">
+        <h1 class="display-3 fw-bold">Testa il tuo database in tre click</h1>
+        <p class="lead mx-auto mb-4 hero-testo">
+            Crea la tabella se non esiste, inserisci i dati e guardali subito sotto forma di schede.
+        </p>
+        <a href="/home/" class="btn btn-light btn-lg px-4 me-2">Apri il laboratorio</a>
+        <a href="#funzioni" class="btn btn-outline-light btn-lg px-4">Scopri di più</a>
+
+        <div class="mt-4">
+            <span id="stato-db" class="badge bg-secondary fs-6">Controllo database...</span>
+        </div>
+    </div>
+</header>
+
+<section id="funzioni" class="py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-2">Cosa puoi fare</h2>
+        <p class="text-center text-muted mb-5">Tre strumenti essenziali, nessuna complicazione.</p>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 card-hover text-center p-3">
+                    <div class="icona">📥</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Inserisci dati</h5>
+                        <p class="card-text text-muted">Compila un modulo e salva le informazioni in pochi secondi.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 card-hover text-center p-3">
+                    <div class="icona">🗂️</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Tutto organizzato</h5>
+                        <p class="card-text text-muted">Ogni elemento diventa una scheda chiara e facile da leggere.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 card-hover text-center p-3">
+                    <div class="icona">⚡</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Veloce e leggero</h5>
+                        <p class="card-text text-muted">Nessuna installazione: funziona direttamente nel browser.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="come-funziona" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">Come funziona</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="passo">1</div>
+                <h5>Crea la tabella</h5>
+                <p class="text-muted">Prepara il database con un solo clic.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="passo">2</div>
+                <h5>Inserisci i dati</h5>
+                <p class="text-muted">Aggiungi nuove righe dal modulo.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="passo">3</div>
+                <h5>Visualizza</h5>
+                <p class="text-muted">Consulta i risultati sotto forma di schede.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 text-center">
+    <div class="container py-4">
+        <h2 class="fw-bold mb-3">Pronto a provare?</h2>
+        <p class="text-muted mb-4">Apri l'app e inizia subito.</p>
+        <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-5">Vai all'app</a>
+    </div>
+</section>
+
+<footer id="contatti" class="bg-dark text-white-50 py-4">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+        <span>© 2026 Wuscan</span>
+        <span>Progetto scolastico ITIS Paleocapa</span>
+    </div>
+</footer>
+
+<script>
+    async function aggiornaStato() {
+        const badge = document.getElementById("stato-db");
+
+        try {
+            const res = await fetch("{% url 'stato-db' %}");
+            const s = await res.json();
+
+            if (s.tabella) {
+                badge.className = "badge bg-success fs-6";
+                badge.textContent = `Tabella presente · ${s.righe} righe`;
+            } else {
+                badge.className = "badge bg-warning text-dark fs-6";
+                badge.textContent = "Tabella non ancora creata";
+            }
+        } catch {
+            badge.className = "badge bg-danger fs-6";
+            badge.textContent = "Database non raggiungibile";
+        }
+    }
+
+    aggiornaStato();
+</script>
+
+{% endblock %}
