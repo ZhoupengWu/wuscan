@@ -13,6 +13,9 @@
     <button id="btn-guarda" class="btn btn-success">Guarda</button>
 </div>
 
+<div class="text-center mb-3">
+    <span id="stato-db" class="badge bg-secondary fs-6">Controllo database...</span>
+</div>
 <div id="messaggio"></div>
 <div id="risultati" class="row g-3"></div>
 
@@ -46,6 +49,7 @@
     const URL_CREA = "{% url 'crea-tabella' %}";
     const URL_INSERISCI = "{% url 'inserisci' %}";
     const URL_VISUALIZZA = "{% url 'visualizza' %}";
+    const URL_STATO = "{% url 'stato-db' %}";
 
     const risultati = document.getElementById("risultati");
     const messaggio = document.getElementById("messaggio");
@@ -96,6 +100,26 @@
         return col;
     }
 
+    async function aggiornaStato() {
+        const badge = document.getElementById("stato-db");
+
+        try {
+            const res = await fetch(URL_STATO);
+            const s = await res.json();
+
+            if (s.tabella) {
+                badge.className = "badge bg-success fs-6";
+                badge.textContent = `Tabella presente · ${s.righe} righe`;
+            } else {
+                badge.className = "badge bg-warning text-dark fs-6";
+                badge.textContent = "Tabella non ancora creata";
+            }
+        } catch {
+            badge.className = "badge bg-danger fs-6";
+            badge.textContent = "Database non raggiungibile";
+        }
+    }
+
     async function carica() {
         try {
             const res = await fetch(URL_VISUALIZZA);
@@ -122,6 +146,7 @@
     document.getElementById("btn-crea").addEventListener("click", async () => {
         const res = await fetch(URL_CREA);
         mostraMessaggio(await res.text(), res.ok ? "success" : "danger");
+        aggiornaStato();
     });
 
     document.getElementById("btn-guarda").addEventListener("click", carica);
@@ -141,11 +166,13 @@
             bootstrap.Modal.getInstance(document.getElementById("modal-inserisci")).hide();
             mostraMessaggio(testo, "success");
             carica();
-
+            aggiornaStato();
         } else {
             mostraMessaggio(testo, "danger");
         }
     });
+
+    aggiornaStato();
 </script>
 
 {% endblock %}
