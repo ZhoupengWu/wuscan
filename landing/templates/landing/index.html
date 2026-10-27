@@ -16,7 +16,7 @@
                 <li class="nav-item"><a class="nav-link" href="#come-funziona">Come funziona</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contatti">Contatti</a></li>
                 <li class="nav-item">
-                    <a class="btn btn-primary btn-sm" href="/home/">Apri l'app</a>
+                    <a class="btn btn-primary btn-sm" href="{% url 'home' %}">Apri l'app</a>
                 </li>
             </ul>
         </div>
@@ -29,7 +29,7 @@
         <p class="lead mx-auto mb-4 hero-testo">
             Crea la tabella se non esiste, inserisci i dati e guardali subito sotto forma di schede.
         </p>
-        <a href="/home/" class="btn btn-light btn-lg px-4 me-2">Apri il laboratorio</a>
+        <a href="{% url 'home' %}" class="btn btn-light btn-lg px-4 me-2">Apri il laboratorio</a>
         <a href="#funzioni" class="btn btn-outline-light btn-lg px-4">Scopri di più</a>
 
         <div class="mt-4">

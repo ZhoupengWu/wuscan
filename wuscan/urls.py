@@ -21,4 +21,5 @@ urlpatterns = [
     path("", include("landing.urls")),
     path('admin/', admin.site.urls),
     path("home/", include("home_test.urls")),
+    path("tg/", include("tgbot.urls")),
 ]

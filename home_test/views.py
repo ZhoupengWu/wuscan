@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from .services.db import crea_tabella, aggiungi_nota, leggi_note, stato
 from django.views.decorators.http import require_POST
+from .services.db import crea_tabella, aggiungi_nota, leggi_note, stato
+from tgbot.services.client import isAvaibleBot, sendMessage
 
 def home(request: HttpRequest):
     return render(request, "home_test/index.html")
@@ -26,6 +27,9 @@ def inserisciDati(request: HttpRequest):
         return HttpResponse("Obbligo compilazione dati", status=400)
 
     aggiungi_nota(text, colpo)
+
+    if isAvaibleBot():
+        sendMessage(f"Nuovo dato inserito: {text} --- {colpo}")
 
     return HttpResponse("Dati inseriti", status=201)
 
